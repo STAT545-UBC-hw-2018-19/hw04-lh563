@@ -3,5 +3,84 @@ title: "hw04-lh563"
 author: "Lu Han"
 date: "10/4/2018"
 output: github_document
+
 ---
+
+### Homework 04: Tidy data and joins
+
+```{r}
+suppressPackageStartupMessages(library("gapminder"))
+suppressPackageStartupMessages(library("tidyverse"))
+
+```
+Activity #2
+
+Make a tibble with one row per year and columns for life expectancy for two or more countries.
+Use knitr::kable() to make this table look pretty in your rendered homework.
+Take advantage of this new data shape to scatterplot life expectancy for one country against that of another.
+
+```{r}
+#I want to filter get the data from only China, India and Japan
+gap_reshape<-gapminder %>% 
+  select(country, year, lifeExp) %>% 
+  group_by(country) %>% 
+  filter(country=="China"|country=="India"|country=="Japan")
+
+#?knitr::kable
+  spread(gap_reshape,key=country,value=lifeExp) %>% 
+  knitr::kable(caption="China,India and Japan's life expectancy in different years",
+               align = "c")
+```
+The data can be presented nicely with scattered points and lines.
+```{r}
+gap_reshape %>% 
+  ggplot(aes(year,lifeExp)) +
+  geom_point(aes(color=country))+
+  geom_line(aes(color=country))+
+  xlab("Year")+
+  ylab("Life expectancy ")+
+  ggtitle("Life expectancy of China, India and Japan from 1952-2007")
+  
+```
+As we can see from the plot that the life expectancy in Chian decreased significantly in 1962. This is due to the Cultural Revolution happening in China in the 1960s which killed millions of people.
+
+### Activity #2
+
+Create your own cheatsheet patterned after Jenny’s but focused on something you care about more than comics! Inspirational examples:
+#First,let's input the dataframe. It listed some of the restaurants in the Vancouver and my taste to some of them.
+```{r}
+restaurants<-tibble(name=c('Kinyo','Miku','Lupo','Blue water cafe','The victor'),country=c('Japan','Japan','Italy','Canada','Canada'),price=c('moderate','high','low','high','high'),food=c('sushi','sushi','Mexican','Seafood','Steak'))
+  
+knitr::kable(restaurants)                   
+
+my_taste<-tibble(name=c('Kinyo','Miku','Lupo'),ranking=c('like','like','dislike'))
+
+```
+### Next we will try left_join(),inner_join(),full_join(),semi_join() and anti_join() based on the two datasets we just created.
+
+```{r}
+left_join(restaurants,my_taste,by="name") %>% 
+  knitr::kable(format="markdown")
+```
+```{r}
+right_join(restaurants,my_taste,by="name") %>% 
+  knitr::kable(format="markdown")
+```
+```{r}
+inner_join(restaurants,my_taste,by="name") %>% 
+  knitr::kable(format="markdown")
+```
+
+```{r}
+full_join(restaurants,my_taste,by="name") %>% 
+  knitr::kable(format="markdown")
+```
+```{r}
+semi_join(restaurants,my_taste,by="name") %>% 
+  knitr::kable(format="markdown")
+```
+```{r}
+anti_join(restaurants,my_taste,by="name") %>% 
+  knitr::kable(format="markdown")
+```
 
